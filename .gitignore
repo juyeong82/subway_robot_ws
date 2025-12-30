@@ -1,0 +1,19 @@
+# ROS2 build artifacts
+build/
+install/
+log/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# YOLO / Large Data (LFS로 관리하므로 제외하지 않음, 단 원본 데이터셋은 제외 권장)
+# datasets/
