@@ -169,6 +169,51 @@
         .btn-emergency { background: #5a1a1a; color: #ffadb6; border: 1px solid #842029; width: 100%; font-weight: 800; font-size: 1.2rem; padding: 18px; border-radius: 6px; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; }
         .btn-emergency:hover { background: #b02a37; color: #fff; box-shadow: 0 0 20px rgba(220, 53, 69, 0.6); transform: translateY(-2px); }
         .btn-emergency:active { transform: scale(0.98); }
+
+        /* 제어 패널 스타일 */
+        .hover-box { transition: background 0.2s; cursor: pointer; background: #1a1a1a; }
+        .hover-box:hover { background: #2f2f2f; border-color: #666 !important; }
+        .form-check-input:checked + label { color: #fff; }
+        .target-panel { display: flex; flex-direction: column; gap: 15px; height: 100%; justify-content: center;}
+
+        /* 타겟 컨트롤 패널 개선 스타일 */
+        .target-select-card {
+            background-color: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.6; /* 미선택 시 약간 어둡게 */
+        }
+        
+        /* 라디오 버튼 체크 시 스타일 (활성화 느낌 강조) */
+        .btn-check:checked + .target-select-card {
+            background-color: #222;
+            border-color: #0d6efd; /* 선택된 테두리 색상 */
+            opacity: 1.0;
+            box-shadow: 0 0 15px rgba(13, 110, 253, 0.15);
+        }
+
+        /* 좌표 텍스트 스타일 */
+        .coord-group { text-align: center; margin-top: 5px; }
+        .coord-label { font-size: 0.8rem; color: #888; display: block; margin-bottom: 2px; }
+        .coord-value { 
+            font-family: 'Consolas', monospace; 
+            font-size: 1.6rem; /* 폰트 크기 대폭 확대 */
+            font-weight: 700; 
+            letter-spacing: 1px;
+        }
+        .coord-unit { font-size: 0.9rem; color: #666; font-weight: normal; margin-left: 2px; }
+
+        /* 상태 뱃지 위치 조정 */
+        .status-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; background: #333; color: #aaa; margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -219,46 +264,102 @@
 
     <div class="row row-info">
         
-        <div class="col-scenario">
-            <div class="card">
+        <div class="col-scenario" style="display: flex; flex-direction: column; gap: 20px;">
+    
+            <div class="card" style="flex: 2; min-height: 0;">
                 <div class="card-header">
                     <span>심정지 대응 시나리오 진행상황</span>
                 </div>
-                
-                <div class="card-body">
-                    <div class="scenario-content-wrapper">
+                <div class="card-body p-0 d-flex flex-column justify-content-center">
+                    <div class="scenario-content-wrapper" style="padding: 10px 50px;">
                         <div class="progress-container">
-                            <div class="progress-track"></div>
+                            <div class="progress-track" style="top: 30px;"></div>
                             <div class="scenario-steps">
                                 <div class="step-item active" id="step-1">
-                                    <div class="step-circle">1</div>
-                                    <div class="step-label">상황 접수</div>
+                                    <div class="step-circle" style="width: 50px; height: 50px; font-size: 1.2rem; margin-bottom: 5px;">1</div>
+                                    <div class="step-label" style="font-size: 0.9rem;">상황 접수</div>
                                 </div>
                                 <div class="step-item" id="step-2">
-                                    <div class="step-circle">2</div>
-                                    <div class="step-label">유닛 출동</div>
+                                    <div class="step-circle" style="width: 50px; height: 50px; font-size: 1.2rem; margin-bottom: 5px;">2</div>
+                                    <div class="step-label" style="font-size: 0.9rem;">유닛 출동</div>
                                 </div>
                                 <div class="step-item" id="step-3">
-                                    <div class="step-circle">3</div>
-                                    <div class="step-label">환자 발견</div>
+                                    <div class="step-circle" style="width: 50px; height: 50px; font-size: 1.2rem; margin-bottom: 5px;">3</div>
+                                    <div class="step-label" style="font-size: 0.9rem;">환자 발견</div>
                                 </div>
                                 <div class="step-item" id="step-4">
-                                    <div class="step-circle">4</div>
-                                    <div class="step-label">구급대 진입</div>
+                                    <div class="step-circle" style="width: 50px; height: 50px; font-size: 1.2rem; margin-bottom: 5px;">4</div>
+                                    <div class="step-label" style="font-size: 0.9rem;">구급대 진입</div>
                                 </div>
                                 <div class="step-item" id="step-5">
-                                    <div class="step-circle">5</div>
-                                    <div class="step-label">상황 종료</div>
+                                    <div class="step-circle" style="width: 50px; height: 50px; font-size: 1.2rem; margin-bottom: 5px;">5</div>
+                                    <div class="step-label" style="font-size: 0.9rem;">상황 종료</div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="scenario-footer">
-                        <button class="btn btn-emergency" onclick="stopTask()">
-                            ⚠ 비상 정지 (EMERGENCY STOP)
-                        </button>
+                </div>
+            </div>
+
+            <div class="card" style="flex: 3; min-height: 0;">
+                <div class="card-header">
+                    <span>🎯 로봇 출동 제어 (Target Control)</span>
+                </div>
+                
+                <div class="card-body p-3 d-flex flex-column gap-5">
+    
+                    <div class="row g-3" style="flex: 6; min-height: 0;">
+                        
+                        <div class="col-6" style="height: 100%;">
+                            <input type="radio" class="btn-check" name="targetSource" id="srcYolo" value="yolo" checked>
+                            <label class="target-select-card w-100 h-100" for="srcYolo">
+                                <div id="badge-yolo" class="status-badge">AI DETECT</div>
+                                <div style="color: #00ff00; font-weight: bold; font-size: 1.0rem; margin-bottom: 3px;">🤖 AUTO (AI)</div>
+                                <div class="coord-group">
+                                    <div id="val-yolo" class="coord-value" style="color: #fff; font-size: 1.3rem;">
+                                        -- . --
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="col-6" style="height: 100%;">
+                            <input type="radio" class="btn-check" name="targetSource" id="srcManual" value="manual">
+                            <label class="target-select-card w-100 h-100" for="srcManual">
+                                <div id="badge-manual" class="status-badge">WAITING</div>
+                                <div style="color: #00d4ff; font-weight: bold; font-size: 1.0rem; margin-bottom: 3px;">👆 MANUAL</div>
+                                <div class="coord-group">
+                                    <div id="val-manual" class="coord-value" style="color: #fff; font-size: 1.3rem;">
+                                        -- . --
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
                     </div>
+
+                    <div class="row g-3" style="flex: 4; min-height: 0;">
+                        <div class="col-6" style="height: 100%;">
+                            <button class="btn btn-danger w-100 h-100 d-flex justify-content-center align-items-center gap-2 rounded-3 shadow-sm" 
+                                    onclick="stopTask()" style="border: 1px solid #842029;">
+                                <span style="font-size: 1.4rem;">🛑</span>
+                                <div class="d-flex flex-column align-items-start" style="line-height: 1;">
+                                    <span class="fw-bold" style="font-size: 1rem;">비상 정지</span>
+                                    <span style="font-size: 0.7rem; opacity: 0.7;">STOP</span>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="col-6" style="height: 100%;">
+                            <button class="btn btn-primary w-100 h-100 d-flex justify-content-center align-items-center gap-2 rounded-3 shadow-sm" 
+                                    onclick="dispatchRobot()" style="border: 1px solid #0d6efd;">
+                                <span style="font-size: 1.4rem;">🚀</span>
+                                <div class="d-flex flex-column align-items-start" style="line-height: 1;">
+                                    <span class="fw-bold" style="font-size: 1rem;">로봇 출동</span>
+                                    <span style="font-size: 0.7rem; opacity: 0.7;">GO</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -309,6 +410,9 @@
             }
             // 2. 로그창 업데이트
             updateLogConsole(data.logs.emergency, data.logs.system); 
+
+            // 타겟 정보 업데이트 호출
+            if(data.targets) updateTargetInfo(data.targets);
         }); 
     }
 
@@ -446,6 +550,94 @@
     function stopTask() {
         fetch('/api/task_end', {method: 'POST'});
         console.log("Emergency Stop Signal Sent.");
+    }
+
+    // [UI 편의성] 박스 클릭 시 라디오버튼 체크
+    function selectRadio(id) {
+        document.getElementById(id).checked = true;
+    }
+
+    // 타겟 정보 UI 업데이트 (가독성 개선 버전)
+    function updateTargetInfo(targets) {
+        // 요소 참조
+        const elYoloVal = document.getElementById('val-yolo');
+        const elYoloBadge = document.getElementById('badge-yolo');
+        
+        const elManualVal = document.getElementById('val-manual');
+        const elManualBadge = document.getElementById('badge-manual');
+        
+        // 1. YOLO 정보 업데이트
+        if (targets.yolo_active) {
+            elYoloBadge.innerText = "DETECTED";
+            elYoloBadge.classList.add('status-active');
+            // 좌표 강조 색상 및 큰 폰트 적용
+            elYoloVal.innerHTML = `
+                <span style="color:#00ff00;">X:${targets.yolo.x.toFixed(1)}</span>
+                <span style="color:#666; font-weight:lighter;">|</span>
+                <span style="color:#00ff00;">Y:${targets.yolo.y.toFixed(1)}</span>
+            `;
+        } else {
+            elYoloBadge.innerText = "SEARCHING...";
+            elYoloBadge.classList.remove('status-active');
+            elYoloVal.innerHTML = `<span style="color:#555; font-size:1.2rem;">NO TARGET</span>`;
+        }
+
+        // 2. Manual 정보 업데이트
+        if (targets.manual && targets.manual.valid) {
+            elManualBadge.innerText = "SET";
+            elManualBadge.classList.add('status-active');
+            elManualBadge.style.background = "#0dcaf0"; // Cyan 계열
+            elManualBadge.style.color = "#000";
+            
+            elManualVal.innerHTML = `
+                <span style="color:#00d4ff;">X:${targets.manual.x.toFixed(1)}</span>
+                <span style="color:#666; font-weight:lighter;">|</span>
+                <span style="color:#00d4ff;">Y:${targets.manual.y.toFixed(1)}</span>
+            `;
+        } else {
+            elManualBadge.innerText = "WAITING";
+            elManualBadge.classList.remove('status-active');
+            elManualBadge.style.background = "#333";
+            elManualBadge.style.color = "#aaa";
+            elManualVal.innerHTML = `<span style="color:#555; font-size:1.2rem;">CLICK CAM</span>`;
+        }
+    }
+
+    // 출동 명령 전송 함수
+    function dispatchRobot() {
+        const selectedMode = document.querySelector('input[name="targetSource"]:checked').value;
+        const btn = document.querySelector('button[onclick="dispatchRobot()"]');
+
+        // 유효성 검사
+        if(selectedMode === 'yolo') {
+            const txt = document.getElementById('info-yolo').innerText;
+            if(txt.includes("없습니다")) { alert("❌ YOLO 감지된 환자가 없습니다."); return; }
+        } else {
+            const txt = document.getElementById('info-manual').innerText;
+            if(txt.includes("설정됩니다")) { alert("❌ 화면을 클릭하여 목표를 먼저 설정하세요."); return; }
+        }
+
+        // API 호출
+        fetch('/api/dispatch', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ mode: selectedMode })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === 'success') {
+                // 성공 애니메이션
+                const origHTML = btn.innerHTML;
+                btn.innerHTML = "✅<br>전송됨";
+                btn.classList.replace('btn-primary', 'btn-success');
+                setTimeout(() => {
+                    btn.innerHTML = origHTML;
+                    btn.classList.replace('btn-success', 'btn-primary');
+                }, 1500);
+            } else {
+                alert("출동 명령 실패: " + data.msg);
+            }
+        });
     }
 </script>
 </body>

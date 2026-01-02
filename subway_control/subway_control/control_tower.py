@@ -62,6 +62,17 @@ app.secret_key = 'subway_secret_key'
 robots_data = {
     "robotA": {"bat": 0, "x": 0.0, "y": 0.0, "status": "연결 대기"}
 }
+
+# [좌표 버퍼] YOLO 및 클릭 좌표 임시 저장소
+target_buffer = {
+    "yolo": {
+        "valid": False, "u": 0, "v": 0, "x": 0.0, "y": 0.0, "last_seen": 0
+    },
+    "manual": {
+        "valid": False, "u": 0, "v": 0, "x": 0.0, "y": 0.0
+    }
+}
+
 camera_status = {1: False, 2: False} 
 global_frame_left = None
 global_frame_right = None
@@ -219,7 +230,8 @@ class HomographyConverter:
         if self.H is None: return 0.0, 0.0
         p = np.array([[[u, v]]], dtype=np.float32)
         m = cv2.perspectiveTransform(p, self.H)
-        return m[0][0][0], m[0][0][1]
+
+        return float(m[0][0][0]), float(m[0][0][1])
 
 class VisionSystem(threading.Thread):
     def __init__(self, ros_node):
@@ -282,7 +294,13 @@ class VisionSystem(threading.Thread):
             
             if cid == CLASS_ID_PATIENT:
                 pc = (cx, cy); mx, my = conv.pixel_to_map(cx, cy)
-                if self.ros_node: self.ros_node.pub_goal(mx, my)
+
+                target_buffer["yolo"] = {
+                    "valid": True,
+                    "u": cx, "v": cy,
+                    "x": mx, "y": my,
+                    "last_seen": time.time()
+                }
             elif cid == CLASS_ID_RESPONDER: 
                 rc = (cx, cy)
         if pc and rc:
@@ -469,10 +487,23 @@ def get_status_api():
     sys_logs = [[r['id'], r['content'], r['timestamp']] for r in c.fetchall()]
     conn.close()
     
+    # YOLO 데이터 유효성 판단 (2초 이내 감지된 것만)
+    is_yolo_active = False
+    if target_buffer["yolo"]["valid"]:
+        if time.time() - target_buffer["yolo"]["last_seen"] < 2.0:
+            is_yolo_active = True
+        else:
+            target_buffer["yolo"]["valid"] = False
+    
     return jsonify({
         "robots": {"robotA": robots_data["robotA"]}, 
         "logs": {"emergency": emer_logs[::-1], "system": sys_logs}, 
-        "is_active": active
+        "is_active": active,
+        "targets": {
+            "yolo": target_buffer["yolo"],
+            "manual": target_buffer["manual"],
+            "yolo_active": is_yolo_active
+        }
     })
 
 # [API] 보고서 데이터 조회
@@ -527,9 +558,45 @@ def click_event():
     if vision_system:
         conv = vision_system.conv_l if cid == 1 else vision_system.conv_r
         mx, my = conv.pixel_to_map(u, v)
-        if ros_node: ros_node.pub_goal(mx, my)
-        save_simple_log(f"클릭 명령: Cam{cid}({u},{v})->Map({mx:.1f},{my:.1f})")
+        
+        target_buffer["manual"] = {
+            "valid": True, "u": u, "v": v, "x": mx, "y": my
+        }
+        save_simple_log(f"좌표 설정(Manual): Cam{cid}({u},{v})->Map({mx:.1f},{my:.1f})")
+        
     return jsonify({"status": "success"})
+
+# UI에서 출동 버튼 누를 때 호출
+@app.route('/api/dispatch', methods=['POST'])
+def dispatch_robot():
+    d = request.json
+    mode = d.get('mode') # 'yolo' or 'manual'
+    
+    target_x, target_y = 0.0, 0.0
+    valid = False
+    src_name = ""
+    
+    if mode == 'yolo' and target_buffer['yolo']['valid']:
+        target_x = target_buffer['yolo']['x']
+        target_y = target_buffer['yolo']['y']
+        valid = True
+        src_name = "AUTO(YOLO)"
+    elif mode == 'manual' and target_buffer['manual']['valid']:
+        target_x = target_buffer['manual']['x']
+        target_y = target_buffer['manual']['y']
+        valid = True
+        src_name = "MANUAL(CLICK)"
+        
+    if valid and ros_node:
+        # [요청사항] 확실한 명령 전달을 위해 5회 반복 퍼블리시
+        for _ in range(5):
+            ros_node.pub_goal(target_x, target_y)
+            time.sleep(0.05)
+        
+        save_simple_log(f"🚨 로봇 출동 명령 전송 ({src_name}) -> ({target_x:.2f}, {target_y:.2f})")
+        return jsonify({"status": "success"})
+    else:
+        return jsonify({"status": "error", "msg": "Invalid Target"}), 400
 
 @app.route('/api/task_end', methods=['POST'])
 def task_end():
