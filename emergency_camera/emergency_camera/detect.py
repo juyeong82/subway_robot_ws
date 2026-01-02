@@ -3,14 +3,14 @@ from ultralytics import YOLO
 
 # 1. 학습된 모델 불러오기 (경로 수정 필요)
 # 보통 'runs/detect/train/weights/best.pt'에 저장됨
-model_path = '/home/juyeong/subway_robot_ws/src/emergency_camera/emergency_camera/models/result01.pt' 
+model_path = '/home/juyeong/subway_robot_ws/src/emergency_camera/emergency_camera/subway_project/train_result8/weights/result08.pt' 
 # model_path = '/home/juyeong/subway_robot_ws/src/emergency_camera/emergency_camera/models/yolo11n.pt' 
 
 
 model = YOLO(model_path)
 
 # 2. 웹캠 연결 (사용자 요청: 2번 카메라)
-camera_index = 1
+camera_index = 2
 cap = cv2.VideoCapture(camera_index)
 
 # 카메라 연결 확인

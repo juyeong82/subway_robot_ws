@@ -63,7 +63,7 @@ def main():
     converter = CoordConverter()
     
     # 웹캠 연결 (환경에 맞게 인덱스 수정)
-    camera_index = 4
+    camera_index = 2
     cap = cv2.VideoCapture(camera_index)
     
     # MJPG 코덱 및 해상도 설정
