@@ -16,4 +16,4 @@ env/
 .idea/
 
 # YOLO / Large Data (LFS로 관리하므로 제외하지 않음, 단 원본 데이터셋은 제외 권장)
-# datasets/
+train_data/

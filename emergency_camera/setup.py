@@ -24,7 +24,9 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'yolo_detector = emergency_camera.yolo_detector:main'
+            'yolo_detector = emergency_camera.yolo_detector:main',
+            'control_tower = emergency_camera.control_tower:main',
+            'demo_robot_client = emergency_camera.demo_robot_client:main',
         ],
     },
 )
